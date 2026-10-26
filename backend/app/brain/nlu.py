@@ -5,20 +5,23 @@ import re
 
 @dataclass
 class NLUResult:
-    intents : set[str] = field(default_factory=set)
-    service : str | None = None
-    appt_date : date | None = None
-    appt_time : time | None = None
-    name : str | None = None
-    phone : str | None = None
+    intents: set[str] = field(default_factory=set)
+    service: str | None = None
+    appt_date: date | None = None
+    appt_time: time | None = None
+    name: str | None = None
+    phone: str | None = None
+    choice: int | None = None      # "the second one" -> 2 (1-based)
+    relation: str | None = None    # "my mother" -> "mother" (the patient is someone else)
 
 
 MONEY_PATTERN = re.compile(r"\b\d{1,3}k\b|\b\d{3,6}\s?(?:rupees|rs|pkr)\b")  # for money like 8k , 10k etc
 
+
 def normalize(raw: str) -> str:
     text = raw.lower()
-    text = re.sub(r"['.]", "", text) # it will remove dots and apostrophes
-    text = re.sub(r"[^a-z0-9 :]", " ", text)   # other puntuations
+    text = re.sub(r"['.]", "", text)          # delete apostrophes and dots
+    text = re.sub(r"[^a-z0-9 :]", " ", text)  # other punctuation -> space, keep the colon
     return " ".join(text.split())
 
 
@@ -34,14 +37,14 @@ INTENT_PHRASES = {
         "see the dentist", "see a dentist", "come in", "come to the clinic",
         "visit",
     ],
-      "ask_hours": [
-      "hours", "working hours", "opening hours", "timing", "timings",
-      "clinic time", "clinic timing", "clinic timings", "your time", "your timing",
-      "are you open", "is the clinic open", "open on", "open till", "open until",
-      "closed on", "are you closed", "opening time", "closing time",
-      "when do you open", "when do you close", "what time do you open",
-      "what time do you close", "what time", "until what time", "till what time",
-  ],
+    "ask_hours": [
+        "hours", "working hours", "opening hours", "timing", "timings",
+        "clinic time", "clinic timing", "clinic timings", "your time", "your timing",
+        "are you open", "is the clinic open", "open on", "open till", "open until",
+        "closed on", "are you closed", "opening time", "closing time",
+        "when do you open", "when do you close", "what time do you open",
+        "what time do you close", "what time", "until what time", "till what time",
+    ],
     "ask_availability": [
         "available", "availability", "any slot", "any slots", "do you have a slot",
         "any opening", "earliest", "soonest", "first available", "next available",
@@ -126,6 +129,7 @@ INTENT_PHRASES = {
         "move my appointment", "move the appointment", "shift my appointment",
     ],
 }
+
 SERVICE_PHRASES = {
     "wisdom tooth extraction": [
         "wisdom tooth", "wisdom teeth", "wisdom", "molar extraction", "molar",
@@ -144,6 +148,7 @@ SERVICE_PHRASES = {
     ],
 }
 
+
 def detect_intents(text: str) -> set[str]:
     cleaned = normalize(text)
     padded = f" {cleaned} "
@@ -156,10 +161,11 @@ def detect_intents(text: str) -> set[str]:
         found.add("ask_discount")
     return found
 
+
 def detect_service(text: str) -> str | None:
     padded = f" {normalize(text)} "
-    for service, phrases in SERVICE_PHRASES.items():       
+    for service, phrases in SERVICE_PHRASES.items():
         for phrase in phrases:
             if f" {phrase} " in padded:
-                return service                 
-    return None                          
+                return service
+    return None
