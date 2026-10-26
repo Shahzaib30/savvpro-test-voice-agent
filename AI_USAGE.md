@@ -38,7 +38,6 @@ then write my own call scenarios (see DESIGN.md section 1) before writing any co
 | Next.js frontend (`frontend/`) | **AI** | I reviewed it; Next.js is a stack I know well |
 | README, DESIGN, this file | AI draft, edited by me | The scenarios and process in DESIGN.md are mine |
 
-[FILL: change any row that is not exactly true. If you wrote or heavily changed any AI-generated file, say which.]
 
 ## 4. Where the AI was wrong, and how I caught it
 
@@ -54,14 +53,12 @@ then write my own call scenarios (see DESIGN.md section 1) before writing any co
 * **My own bugs, found with AI review:** wrong annotation syntax (`=` instead of `:`), a typo in an import,
   booking being stored *before* the opening-hours check, an unbounded `while True` slot search, a rounding bug on the
   30-minute grid, and `normalize` removing commas instead of turning them into spaces.
-* [FILL: add anything else you noticed that was wrong in the frontend, the API or the policy.]
 
 ## 5. How I checked the AI's work
 
 * I ran everything: `python -m pytest -q` (all backend tests pass), and `npm test`, `npm run typecheck`,
   `npm run build` in the frontend.
 * I ran the full app and made test calls in the browser, including the taken-slot and discount cases from my scenarios.
-* I read the generated brain code against my arrow table. [FILL: only keep this sentence if it is true.]
 * No secrets are committed: `.env` files are git-ignored; only `.env.example` files are in the repo.
 
 ## 6. Token usage
